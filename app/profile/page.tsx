@@ -76,6 +76,7 @@ export default function ProfilePage() {
       const json = await res.json();
       setNewPost(json.suggestion || "Не удалось получить идею.");
     } catch (e) {
+      console.error(e);
       setNewPost("Произошла ошибка при получении идеи.");
     } finally {
       setIsLoading(false);

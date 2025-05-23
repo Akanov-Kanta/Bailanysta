@@ -25,7 +25,7 @@ export default function HomePage() {
 
   useEffect(() => {
     async function loadPosts() {
-      let { data: postsData } = await supabase
+      const { data: postsData } = await supabase
         .from("posts")
         .select("*")
         .order("created_at", { ascending: false });

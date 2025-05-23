@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
     const newPost: Post = data[0]
     return NextResponse.json(newPost, { status: 201 })
   } catch (e) {
+    console.error(e)
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 }
