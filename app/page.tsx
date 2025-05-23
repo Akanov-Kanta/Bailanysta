@@ -21,7 +21,6 @@ export default function HomePage() {
   const [username, setUsername] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
-  const [likeAnimating, setLikeAnimating] = useState<string | null>(null);
   const [newComments, setNewComments] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,14 +36,18 @@ export default function HomePage() {
       try {
         setIsLoading(true);
 
-        const { data: postsData } = await supabase
+        const { data: postsData, error: postsError } = await supabase
           .from("posts")
           .select("*, comments(id, content, username)")
           .order("created_at", { ascending: false });
 
-        const { data: likesData } = await supabase
+        if (postsError) throw postsError;
+
+        const { data: likesData, error: likesError } = await supabase
           .from("likes")
           .select("post_id");
+
+        if (likesError) throw likesError;
 
         const likesCountMap = likesData?.reduce((acc, like) => {
           acc[like.post_id] = (acc[like.post_id] || 0) + 1;
@@ -59,6 +62,7 @@ export default function HomePage() {
 
         setPosts(postsWithLikes);
       } catch (error) {
+        console.error("Ошибка загрузки постов:", error);
         toast.error("Ошибка загрузки постов");
       } finally {
         setIsLoading(false);
@@ -77,8 +81,6 @@ export default function HomePage() {
   }
 
   async function handleLike(postId: string) {
-    setLikeAnimating(postId);
-
     try {
       const res = await fetch("/api/posts/like", {
         method: "POST",
@@ -89,7 +91,7 @@ export default function HomePage() {
       const data = await res.json();
 
       if (data.success) {
-        const updatedLikes = await getLikes(postId); // получить актуальное число лайков
+        const updatedLikes = await getLikes(postId);
         setPosts((prev) =>
           prev.map((post) =>
             post.id === postId ? { ...post, likes: updatedLikes } : post
@@ -98,11 +100,10 @@ export default function HomePage() {
       } else {
         toast.error("Ошибка при лайке: " + (data.error || "unknown"));
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Ошибка при лайке:", error);
       toast.error("Сетевая ошибка при лайке");
     }
-
-    setTimeout(() => setLikeAnimating(null), 600);
   }
 
   async function handleCommentSubmit(postId: string) {
@@ -116,21 +117,26 @@ export default function HomePage() {
         body: JSON.stringify({
           postId,
           content: comment,
-          username: username, // Убедитесь что здесь передается username
+          username: username,
         }),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        console.log("Received comments:", data.comments); // Добавьте лог
+        console.log("Received comments:", data.comments);
         setPosts((prev) =>
           prev.map((post) =>
             post.id === postId ? { ...post, comments: data.comments } : post
           )
         );
+        setNewComments((prev) => ({ ...prev, [postId]: "" }));
+        toast.success("Комментарий добавлен!");
+      } else {
+        toast.error("Ошибка при комментировании: " + (data.error || "unknown"));
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Ошибка при отправке комментария:", error);
       toast.error("Сетевая ошибка при отправке комментария");
     }
   }
@@ -229,16 +235,13 @@ export default function HomePage() {
                       </button>
                     </div>
 
-                    {/* Блок с комментариями */}
                     <div className="mt-4 space-y-2">
                       {post.comments?.map((c) => (
                         <div
                           key={c.id}
                           className="text-indigo-100 bg-white bg-opacity-5 px-4 py-2 rounded-lg"
                         >
-                          <p className="text-sm font-semibold">
-                            user: {c.username}
-                          </p>
+                          <p className="text-sm font-semibold">{c.username}:</p>
                           <p>{c.content}</p>
                         </div>
                       ))}
