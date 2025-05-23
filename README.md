@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Twittgram — социальная лента
 
-## Getting Started
+Деплой на Vercel: https://bailanysta-murex.vercel.app/
 
-First, run the development server:
+Twittgram — это минималистичная социальная лента, в которой пользователи могут публиковать посты, лайкать и комментировать их.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Проектирование и разработка
+Next.js App Router используется для разделения клиентской и серверной логики.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Supabase выполняет функции БД, аутентификации и реалтайм-обновлений.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Клиентский код использует React hooks и TailwindCSS для стилизации.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Анимации реализованы с помощью Framer Motion.
 
-## Learn More
+## Выбор стека
+Next.js — даёт SSR/ISR, упрощает маршрутизацию и API-обработку.
 
-To learn more about Next.js, take a look at the following resources:
+Supabase — готовое решение для базы данных PostgreSQL с realtime, REST и RPC.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+TailwindCSS — быстрый и наглядный способ стилизации.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Framer Motion — простая библиотека анимаций для React.
 
-## Deploy on Vercel
+Такой стек позволяет быстро собрать MVP и сфокусироваться на UX и логике.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Уникальные подходы
+Минимальный UX без регистрации: никнейм сохраняется в localStorage.
+
+Серверные функции (route.ts) обрабатывают лайки и комментарии с защитой от недостающих данных.
+
+
+## Установка и запуск
+
+1. Клонируйте репозиторий:
+   git clone https://github.com/Akanov-Kanta/Bailanysta
+2. cd Bailanysta
+3. Установите зависимости:
+  npm install
+4. Запустите локально:
+  npm run dev
+
+## Учтите что база данных не будет работать на локальном, потому что я использую supabase и переменные со значениями заданы в .env.local, так же АПИ ключ OPENAI там же поэтому можете эти функционалы оценить в деплойнутой версии
